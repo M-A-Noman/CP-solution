@@ -1,0 +1,107 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 9999;
+bool chk[N];
+vector<int> graph[N];
+int vis[N], level[N];
+void sieve() // Generating the primes 
+{
+    int i, j;
+    for (i = 2; i <= N; i++)
+        chk[i] = true;
+
+    for (i = 2; i * i <= N; i++)
+    {
+        if (chk[i] == true)
+        {
+            for (j = i * i; j <= N; j += i)
+            {
+                chk[j] = false;
+            }
+        }
+    }
+}
+bool ok(int a, int b)  // check weather the primes has difference of one digit or not
+{
+    int cnt = 0;
+    while (a)
+    {
+
+        if (a % 10 != b % 10)
+            cnt++;
+        a /= 10;
+        b /= 10;
+        if (cnt > 1)
+            return false;
+    }
+    return true;
+}
+int bfs(int source, int destination)  //applying the bfs 
+{
+    queue<int> q;
+    q.push(source);
+    vis[source] = 1;
+    while (!q.empty())
+    {
+        int cur = q.front();
+        q.pop();
+        for (auto child : graph[cur])
+        {
+            if (!vis[child])
+            {
+                q.push(child);
+                vis[child] = 1;
+                level[child] = level[cur] + 1;
+            }
+        }
+    }
+    return level[destination];
+}
+void reset() //reset all the arrays and vector for multi test case
+{
+    for (int i = 0; i < N; i++)
+    {
+        vis[i] = 0;
+        level[i] = 0;
+        graph[i].clear();
+    }
+}
+int main()
+{
+    sieve(); //call the sieve function so that we can use it for all test case hence reduce the time
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        reset(); // reset all array before using them
+        int a, b;
+        cin >> a >> b;
+        int i;
+        vector<int> prime;
+        for (i = 1000; i <= N; i++) // inserting all the prime between 1000 to 9999 so that we can make a graph using those
+        {
+            if (chk[i] == true)
+            {
+                prime.push_back(i);
+            }
+        }
+        
+
+            int j;
+            for (i = 0; i < prime.size(); i++) //generating the graph for all the prime
+            {
+                for (j = 0; j < prime.size(); j++)
+                {
+                    if (ok(prime[i], prime[j]) && i != j)
+                    {
+                        // we will make a edge between any two prime if and only if those prime has one digit difference from each other.
+                        graph[prime[i]].push_back(prime[j]);
+                    }
+                }
+            }
+            int ans = bfs(a, b);
+            cout << ans << '\n';
+        
+    }
+   
+}
